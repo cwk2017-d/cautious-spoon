@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="work.mapper.JobMapper">
+    <resultMap id="JobResultMap" type="work.entity.Job">
+        <id property="id" column="id"/>
+        <result property="companyName" column="company_name"/>
+        <result property="positionName" column="position_name"/>
+        <result property="salary" column="salary"/>
+        <result property="requirements" column="requirements"/>
+        <result property="location" column="location"/>
+        <result property="postTime" column="post_time"/>
+        <result property="jobType" column="job_type"/>
+    </resultMap>
+
+    <!-- 添加岗位 -->
+    <insert id="insertJob" parameterType="work.entity.Job" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO job (company_name, position_name, salary, requirements, location, post_time, job_type)
+        VALUES (#{companyName}, #{positionName}, #{salary}, #{requirements}, #{location}, #{postTime}, #{jobType})
+    </insert>
+
+    <!-- 删除岗位 -->
+    <delete id="deleteJob" parameterType="java.lang.Integer">
+        DELETE FROM job WHERE id = #{id}
+    </delete>
+
+    <!-- 更新岗位信息 -->
+    <update id="updateJob" parameterType="work.entity.Job">
+        UPDATE job
+        <set>
+            <if test="companyName != null">company_name = #{companyName},</if>
+            <if test="positionName != null">position_name = #{positionName},</if>
+            <if test="salary != null">salary = #{salary},</if>
+            <if test="requirements != null">requirements = #{requirements},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="postTime != null">post_time = #{postTime},</if>
+            <if test="jobType != null">job_type = #{jobType}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID查询岗位 -->
+    <select id="selectJobById" parameterType="java.lang.Integer" resultMap="JobResultMap">
+        SELECT * FROM job WHERE id = #{id}
+    </select>
+
+    <!-- 查询所有岗位 -->
+    <select id="selectAllJobs" resultMap="JobResultMap">
+        SELECT * FROM job ORDER BY id DESC
+    </select>
+
+    <!-- 条件查询岗位 -->
+    <select id="selectJobsByCondition" parameterType="java.util.Map" resultMap="JobResultMap">
+        SELECT * FROM job
+        <where>
+            <if test="companyName != null and companyName != ''">
+                AND company_name LIKE CONCAT('%', #{companyName}, '%')
+            </if>
+            <if test="positionName != null and positionName != ''">
+                AND position_name LIKE CONCAT('%', #{positionName}, '%')
+            </if>
+            <if test="salary != null and salary != ''">
+                AND salary LIKE CONCAT('%', #{salary}, '%')
+            </if>
+            <if test="location != null and location != ''">
+                AND location LIKE CONCAT('%', #{location}, '%')
+            </if>
+            <if test="jobType != null and jobType != ''">
+                AND job_type = #{jobType}
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+</mapper>
